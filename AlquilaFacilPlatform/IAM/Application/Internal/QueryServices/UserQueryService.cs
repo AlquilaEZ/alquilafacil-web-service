@@ -1,6 +1,6 @@
 using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.IAM.Domain.Model.Queries;
-using AlquilaFacilPlatform.IAM.Domain.Respositories;
+using AlquilaFacilPlatform.IAM.Domain.Repositories;
 using AlquilaFacilPlatform.IAM.Domain.Services;
 
 namespace AlquilaFacilPlatform.IAM.Application.Internal.QueryServices;

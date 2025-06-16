@@ -18,6 +18,7 @@ public class ReportController(IReportQueryService reportQueryService, IReportCom
     {
         var command = CreateReportCommandFromResourceAssembler.ToCommandFromResource(createReportResource);
         var report = await reportCommandService.Handle(command);
+        if (report is null) return BadRequest();
         var reportResource = ReportResourceFromEntityAssembler.ToResourceFromEntity(report);
         return StatusCode(201, reportResource);
     }

@@ -1,16 +1,17 @@
 using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
-using AlquilaFacilPlatform.IAM.Domain.Respositories;
+using AlquilaFacilPlatform.IAM.Domain.Repositories;
 using AlquilaFacilPlatform.Locals.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Locals.Domain.Model.Commands;
 using AlquilaFacilPlatform.Locals.Domain.Model.Entities;
 using AlquilaFacilPlatform.Locals.Domain.Repositories;
 using AlquilaFacilPlatform.Locals.Domain.Services;
-using AlquilaFacilPlatform.Locals.Infraestructure.Persistence.EFC.Repositories;
+using AlquilaFacilPlatform.Locals.Infrastructure.Persistence.EFC.Repositories;
+using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Shared.Domain.Repositories;
 
 namespace AlquilaFacilPlatform.Locals.Application.Internal.CommandServices;
 
-public class LocalCommandService (ILocalRepository localRepository, ILocalCategoryRepository localCategoryRepository, IUnitOfWork unitOfWork) : ILocalCommandService
+public class LocalCommandService (ILocalRepository localRepository, ILocalCategoryRepository localCategoryRepository, IUserExternalService userExternalService, IUnitOfWork unitOfWork) : ILocalCommandService
 {
     
     public async Task<Local?> Handle(CreateLocalCommand command)
@@ -19,6 +20,11 @@ public class LocalCommandService (ILocalRepository localRepository, ILocalCatego
         if (localCategory == null)
         {
             throw new Exception("Local category not found");
+        }
+        
+        if (!userExternalService.UserExists(command.UserId))
+        {
+            throw new Exception("There are no users matching the id specified");
         }
 
         if (command.Price <= 0)

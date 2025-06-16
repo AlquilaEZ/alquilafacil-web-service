@@ -1,14 +1,13 @@
-using AlquilaFacilPlatform.IAM.Interfaces.ACL;
-using AlquilaFacilPlatform.Locals.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Locals.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Locals.Domain.Model.Commands;
 using AlquilaFacilPlatform.Locals.Domain.Repositories;
 using AlquilaFacilPlatform.Locals.Domain.Services;
+using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Shared.Domain.Repositories;
 
 namespace AlquilaFacilPlatform.Locals.Application.Internal.CommandServices;
 
-public class CommentCommandService(ICommentRepository commentRepository, ILocalRepository localRepository, IUserCommentExternalService userCommentExternalService, IUnitOfWork unitOfWork) : ICommentCommandService
+public class CommentCommandService(ICommentRepository commentRepository, ILocalRepository localRepository, IUserExternalService userExternalService, IUnitOfWork unitOfWork) : ICommentCommandService
 {
     public async Task<Comment?> Handle(CreateCommentCommand command)
     {
@@ -19,7 +18,7 @@ public class CommentCommandService(ICommentRepository commentRepository, ILocalR
             throw new Exception("There is no locals matching the id specified");
         }
         
-        if (!userCommentExternalService.UserExists(command.UserId))
+        if (!userExternalService.UserExists(command.UserId))
         {
             throw new Exception("There are no users matching the id specified");
         }

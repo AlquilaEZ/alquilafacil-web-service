@@ -26,7 +26,9 @@
 
     <ItemGroup>
       <Folder Include=".github\workflows\test.yml\" />
+      <Folder Include="Booking\Application\Internal\" />
       <Folder Include="IAM\Infrastructure\Pipeline\" />
+      <Folder Include="Notifications\Application\Internal\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,7 +1,7 @@
 using AlquilaFacilPlatform.IAM.Domain.Model.Commands;
 using AlquilaFacilPlatform.IAM.Domain.Model.Entities;
 using AlquilaFacilPlatform.IAM.Domain.Model.ValueObjects;
-using AlquilaFacilPlatform.IAM.Domain.Respositories;
+using AlquilaFacilPlatform.IAM.Domain.Repositories;
 using AlquilaFacilPlatform.IAM.Domain.Services;
 using AlquilaFacilPlatform.Shared.Domain.Repositories;
 

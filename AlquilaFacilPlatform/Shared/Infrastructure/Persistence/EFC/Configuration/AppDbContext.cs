@@ -6,6 +6,8 @@ using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.IAM.Domain.Model.Entities;
 using AlquilaFacilPlatform.Locals.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Locals.Domain.Model.Entities;
+using AlquilaFacilPlatform.Management.Domain.Model.Aggregates;
+using AlquilaFacilPlatform.Management.Domain.Model.Entities;
 using AlquilaFacilPlatform.Notifications.Domain.Models.Aggregates;
 using AlquilaFacilPlatform.Profiles.Domain.Model.Aggregates;
 using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
@@ -41,7 +43,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<Subscription>().Property(s => s.VoucherImageUrl).IsRequired();
         builder.Entity<Subscription>().HasOne<SubscriptionStatus>().WithMany()
             .HasForeignKey(s => s.SubscriptionStatusId);
-        
+        builder.Entity<Subscription>()
+            .HasOne<Plan>().WithMany().HasForeignKey(s => s.PlanId);
 
         builder.Entity<SubscriptionStatus>().HasKey(s => s.Id);
         builder.Entity<SubscriptionStatus>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
@@ -53,8 +56,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<Invoice>().Property(i => i.Amount).IsRequired();
         builder.Entity<Invoice>().Property(i => i.Date).IsRequired();
 
-        builder.Entity<Subscription>()
-            .HasOne<Plan>().WithMany().HasForeignKey(s => s.PlanId);
+        
         
 
         builder.Entity<Subscription>().HasOne<Invoice>().WithOne().HasForeignKey<Invoice>(i => i.SubscriptionId);
@@ -235,19 +237,60 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<Report>().Property(report => report.CreatedAt).IsRequired();
         builder.Entity<Report>().HasOne<User>().WithMany().HasForeignKey(r => r.UserId);
         builder.Entity<Report>().HasOne<Local>().WithMany().HasForeignKey(r => r.LocalId);
+
+        builder.Entity<SensorState>().HasKey(s => s.Id);
+        builder.Entity<SensorState>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<SensorState>().Property(s => s.State).IsRequired().HasMaxLength(30);
+        
+        builder.Entity<SensorType>().HasKey(s => s.Id);
+        builder.Entity<SensorType>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<SensorType>().Property(s => s.Type).IsRequired().HasMaxLength(30);
         
         
-            
-        /*builder.Entity<User>()
-            .HasMany(c => c.Profiles)
-            .WithOne(t => t.User)
-            .HasForeignKey(t => t.UserId)
-            .HasPrincipalKey(t => t.Id);*/
-            
+        builder.Entity<Sensor>().HasKey(sensor => sensor.Id);
+        builder.Entity<Sensor>().Property(sensor => sensor.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Sensor>().OwnsOne(sensor => sensor.Code,
+            c =>
+            {
+                c.WithOwner().HasForeignKey("Id");
+                c.Property(s => s.Code).HasColumnName("Code");
+            });
+        builder.Entity<Sensor>().OwnsOne(sensor => sensor.Location,
+            l =>
+            {
+                l.WithOwner().HasForeignKey("Id");
+                l.Property(s => s.LocalLocation).HasColumnName("Location");
+            });
+        builder.Entity<Sensor>().HasOne<SensorType>().WithMany().HasForeignKey(s => s.TypeId);
+        builder.Entity<Sensor>().HasOne<SensorState>().WithMany().HasForeignKey(s => s.StateId);
+        builder.Entity<Sensor>().HasOne<Local>().WithMany().HasForeignKey(s => s.LocalId);
+
+        builder.Entity<Reading>().HasKey(reading => reading.Id);
+        builder.Entity<Reading>().Property(reading => reading.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Reading>().Property(reading => reading.Timestamp).IsRequired();
+        builder.Entity<Reading>().OwnsOne(reading => reading.Value,
+            l =>
+            {
+                l.WithOwner().HasForeignKey("Id");
+                l.Property(v => v.Value).HasColumnName("Value");
+            });
+        builder.Entity<Reading>().OwnsOne(reading => reading.Unit,
+            l =>
+            {
+                l.WithOwner().HasForeignKey("Id");
+                l.Property(u => u.Unit).HasColumnName("Unit");
+            });
+        builder.Entity<Reading>().HasOne<Sensor>().WithMany().HasForeignKey(r => r.SensorId);
+        
+        builder.Entity<Restriction>().HasKey(restriction => restriction.Id);
+        builder.Entity<Restriction>().Property(restriction => restriction.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Restriction>().Property(restriction => restriction.NoiseLevel).IsRequired();
+        builder.Entity<Restriction>().Property(restriction => restriction.SmokeDetection).IsRequired();
+        builder.Entity<Restriction>().Property(restriction => restriction.RestrictedLocation).IsRequired();
+        builder.Entity<Restriction>().HasOne<Local>().WithMany().HasForeignKey(r => r.LocalId);
         
         // Apply SnakeCase Naming Convention
         builder.UseSnakeCaseWithPluralizedTableNamingConvention();
-        
 
     }
 }

@@ -1,12 +1,12 @@
-using AlquilaFacilPlatform.IAM.Application.Internal.OutboundServices;
+using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.IAM.Domain.Model.Commands;
-using AlquilaFacilPlatform.IAM.Domain.Respositories;
+using AlquilaFacilPlatform.IAM.Domain.Repositories;
 using AlquilaFacilPlatform.IAM.Domain.Services;
 using AlquilaFacilPlatform.Shared.Domain.Repositories;
 
 namespace AlquilaFacilPlatform.IAM.Application.Internal.CommandServices;
 
-public class SeedAdminCommandService(IUserRepository repository, IUserCommandService commandService, IProfilesUserExternalService externalService, IUnitOfWork unitOfWork) : ISeedAdminCommandService
+public class SeedAdminCommandService(IUserRepository repository, IUserCommandService commandService, IProfilesExternalService externalService, IUnitOfWork unitOfWork) : ISeedAdminCommandService
 {
     public async Task Handle(SeedAdminCommand command)
     {

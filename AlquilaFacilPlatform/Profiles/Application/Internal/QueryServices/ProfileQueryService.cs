@@ -1,4 +1,4 @@
-using AlquilaFacilPlatform.Profiles.Application.Internal.OutboundServices;
+using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Profiles.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Profiles.Domain.Model.Queries;
 using AlquilaFacilPlatform.Profiles.Domain.Repositories;

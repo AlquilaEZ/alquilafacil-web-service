@@ -1,6 +1,5 @@
-using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
+using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Shared.Domain.Repositories;
-using AlquilaFacilPlatform.Subscriptions.Application.Internal.OutBoundServices;
 using AlquilaFacilPlatform.Subscriptions.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Subscriptions.Domain.Model.Commands;
 using AlquilaFacilPlatform.Subscriptions.Domain.Repositories;
@@ -10,7 +9,7 @@ namespace AlquilaFacilPlatform.Subscriptions.Application.Internal.CommandService
 
 public class SubscriptionCommandService(ISubscriptionRepository subscriptionRepository, ISubscriptionStatusRepository subscriptionStatusRepository,
     IPlanRepository planRepository, 
-    IUnitOfWork unitOfWork, IExternalUserWithSubscriptionService externalUserWithSubscriptionService)
+    IUnitOfWork unitOfWork, IUserExternalService userExternalService)
     : ISubscriptionCommandService
 {
     public async Task<Subscription?> Handle(CreateSubscriptionCommand command)
@@ -22,7 +21,7 @@ public class SubscriptionCommandService(ISubscriptionRepository subscriptionRepo
             throw new Exception("Plan not found");
         }
 
-        if (!externalUserWithSubscriptionService.UserExists(command.UserId))
+        if (!userExternalService.UserExists(command.UserId))
         {
             throw new Exception("User not found");
         }

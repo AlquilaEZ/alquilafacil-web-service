@@ -1,6 +1,3 @@
-using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
-using AlquilaFacilPlatform.IAM.Domain.Respositories;
-using AlquilaFacilPlatform.Profiles.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Profiles.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Profiles.Domain.Model.Commands;
 using AlquilaFacilPlatform.Profiles.Domain.Repositories;

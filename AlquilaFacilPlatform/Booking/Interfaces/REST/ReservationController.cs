@@ -1,5 +1,4 @@
 using System.Net.Mime;
-using AlquilaFacilPlatform.Booking.Application.OutBoundService;
 using AlquilaFacilPlatform.Booking.Domain.Model.Queries;
 using AlquilaFacilPlatform.Booking.Domain.Services;
 using AlquilaFacilPlatform.Booking.Interfaces.REST.Resources;

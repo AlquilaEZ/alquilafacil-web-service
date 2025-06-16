@@ -1,12 +1,9 @@
 using AlquilaFacilPlatform.IAM.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.IAM.Domain.Model.Commands;
-using AlquilaFacilPlatform.IAM.Domain.Respositories;
+using AlquilaFacilPlatform.IAM.Domain.Repositories;
 using AlquilaFacilPlatform.IAM.Domain.Services;
-using AlquilaFacilPlatform.IAM.Infrastructure.Hashing.BCrypt.Services;
-using AlquilaFacilPlatform.Profiles.Domain.Model.Aggregates;
-using AlquilaFacilPlatform.Profiles.Domain.Repositories;
-using AlquilaFacilPlatform.Profiles.Infrastructure.Persistence.EFC.Repositories;
+using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Shared.Domain.Repositories;
 
 namespace AlquilaFacilPlatform.IAM.Application.Internal.CommandServices;
@@ -15,7 +12,7 @@ public class UserCommandService(
     IUserRepository userRepository,
     ITokenService tokenService,
     IHashingService hashingService,
-    IProfilesUserExternalService profilesUserExternalService,
+    IProfilesExternalService profilesExternalService,
     IUnitOfWork unitOfWork)
     : IUserCommandService
 {
@@ -55,7 +52,7 @@ public class UserCommandService(
         {
             await userRepository.AddAsync(user);
             await unitOfWork.CompleteAsync();
-            await profilesUserExternalService.CreateProfile(
+            await profilesExternalService.CreateProfile(
                 command.Name,
                 command.FatherName,
                 command.MotherName,
