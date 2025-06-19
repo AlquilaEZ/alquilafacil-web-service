@@ -3,7 +3,7 @@ using AlquilaFacilPlatform.Shared.Domain.Repositories;
 
 namespace AlquilaFacilPlatform.Management.Domain.Repositories;
 
-public interface IReadingRepository: IBaseRepository<Reading>
+public interface ILocalEdgeNodeRepository: IBaseRepository<LocalEdgeNode>
 {
-    Task<IEnumerable<Reading>> FindAllByLocalId(int localId);
+    Task<LocalEdgeNode?> GetByLocalIdAsync(int localId);
 }

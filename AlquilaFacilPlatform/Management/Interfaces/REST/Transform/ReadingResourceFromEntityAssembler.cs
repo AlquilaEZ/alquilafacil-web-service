@@ -9,10 +9,10 @@ public static class ReadingResourceFromEntityAssembler
     {
         return new ReadingResource(
             reading.Id,
-            reading.SensorId,
-            reading.Timestamp,
-            reading.ReadingValue,
-            reading.ReadingUnit
+            reading.LocalId,
+            reading.SensorTypeId,
+            reading.Message,
+            reading.Timestamp
         );
     }
 }

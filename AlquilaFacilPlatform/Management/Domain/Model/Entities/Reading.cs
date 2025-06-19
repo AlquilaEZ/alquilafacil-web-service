@@ -7,33 +7,31 @@ public class Reading
 {
     public Reading()
     {
-        SensorId = 0;
-        Timestamp = DateTime.MinValue;
-        Value = new ReadingValue();
-        Unit = new ReadingUnit();
+        LocalId = 0;
+        SensorTypeId = 0;
+        Message = string.Empty;
+        Timestamp = DateTime.UtcNow;
     }
     
-    public Reading(int sensorId, DateTime timestamp, string value, string unit)
+    public Reading(int localId, int sensorTypeId, string message, DateTime timestamp)
     {
-        SensorId = sensorId;
+        LocalId = localId;
+        SensorTypeId = sensorTypeId;
+        Message = message;
         Timestamp = timestamp;
-        Value = new ReadingValue(value);
-        Unit = new ReadingUnit(unit);
     }
 
     public Reading(CreateReadingCommand command)
     {
-        SensorId = command.SensorId;
+        LocalId = command.LocalId;
+        SensorTypeId = command.SensorTypeId; 
+        Message = command.Message;
         Timestamp = command.Timestamp;
-        Value = new ReadingValue(command.Value);
-        Unit = new ReadingUnit(command.Unit);
     }
 
     public int Id { get; set; }
-    public int SensorId { get; set; }
+    public int LocalId { get; set; }
+    public int SensorTypeId { get; set; }
+    public string Message { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; }
-    public ReadingValue Value { get; private set; }
-    public ReadingUnit Unit { get; private set; }
-    public string ReadingValue => Value.Value;
-    public string ReadingUnit => Unit.Unit;
 }

@@ -1,5 +1,5 @@
-using AlquilaFacilPlatform.Management.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Management.Domain.Model.Commands;
+using AlquilaFacilPlatform.Management.Domain.Model.Entities;
 using AlquilaFacilPlatform.Management.Domain.Repositories;
 using AlquilaFacilPlatform.Management.Domain.Services;
 using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
@@ -7,22 +7,22 @@ using AlquilaFacilPlatform.Shared.Domain.Repositories;
 
 namespace AlquilaFacilPlatform.Management.Application.Internal.CommandServices;
 
-public class RestrictionCommandService(
-    IRestrictionRepository restrictionRepository,
+public class LocalEdgeNodeCommandService(
+    ILocalEdgeNodeRepository localEdgeNodeRepository,
     ILocalExternalService localExternalService,
     IUnitOfWork unitOfWork
-    ): IRestrictionCommandService
+    ): ILocalEdgeNodeCommandService
 {
-    public async Task<Restriction?> Handle(CreateRestrictionCommand command)
+    public async Task<LocalEdgeNode?> Handle(CreateLocalEdgeNodeCommand command)
     {
-        var localExists = await localExternalService.LocalExists(command.LocalId);
-        if (!localExists)
+        if (!await localExternalService.LocalExists(command.LocalId))
         {
             throw new Exception("Local does not exist");
         }
-        var restriction = new Restriction(command);
-        await restrictionRepository.AddAsync(restriction);
+
+        var localEdgeNode = new LocalEdgeNode(command);
+        await localEdgeNodeRepository.AddAsync(localEdgeNode);
         await unitOfWork.CompleteAsync();
-        return restriction;
+        return localEdgeNode;
     }
 }

@@ -8,10 +8,10 @@ public static class CreateReadingCommandFromResourceAssembler
     public static CreateReadingCommand ToCommandFromResource(CreateReadingResource resource)
     {
         return new CreateReadingCommand(
-            resource.SensorId,
-            resource.Timestamp,
-            resource.Value,
-            resource.Unit
+            resource.LocalId,
+            resource.SensorTypeId,
+            resource.Message,
+            resource.Timestamp
         );
     }
 }

@@ -8,10 +8,11 @@ namespace AlquilaFacilPlatform.Management.Infrastructure.Persistence.EFC.Reposit
 
 public class ReadingRepository(AppDbContext context) : BaseRepository<Reading>(context), IReadingRepository
 {
-    public async Task<IEnumerable<Reading>> FindAllBySensorId(int sensorId)
+    public async Task<IEnumerable<Reading>> FindAllByLocalId(int localId)
     {
         return await Context.Set<Reading>()
-            .Where(reading => reading.SensorId == sensorId)
+            .Where(reading => reading.LocalId == localId)
+            .OrderByDescending(reading => reading.Id)
             .ToListAsync();
     }
 }

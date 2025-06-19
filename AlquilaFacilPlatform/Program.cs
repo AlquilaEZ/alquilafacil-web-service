@@ -234,21 +234,16 @@ builder.Services.AddScoped<IInvoiceCommandService, InvoiceCommandService>();
 
 // Management Bounded Context Injection Configuration
 
-builder.Services.AddScoped<ISensorRepository, SensorRepository>();
-builder.Services.AddScoped<ISensorCommandService, SensorCommandService>();
-builder.Services.AddScoped<ISensorQueryService, SensorQueryService>();
-
+builder.Services.AddScoped<IReadingCommandService, ReadingCommandService>();
+builder.Services.AddScoped<IReadingQueryService, ReadingQueryService>();
 builder.Services.AddScoped<IReadingRepository, ReadingRepository>();
-
-builder.Services.AddScoped<ISensorStateRepository, SensorStateRepository>();
-builder.Services.AddScoped<ISeedSensorStateCommandService, SeedSensorStateCommandService>();
 
 builder.Services.AddScoped<ISensorTypeRepository, SensorTypeRepository>();
 builder.Services.AddScoped<ISeedSensorTypeCommandService, SeedSensorTypeCommandService>();
 
-builder.Services.AddScoped<IRestrictionRepository, RestrictionRepository>();
-builder.Services.AddScoped<IRestrictionCommandService, RestrictionCommandService>();
-builder.Services.AddScoped<IRestrictionQueryService, RestrictionQueryService>();
+builder.Services.AddScoped<ILocalEdgeNodeCommandService, LocalEdgeNodeCommandService>();
+builder.Services.AddScoped<ILocalEdgeNodeQueryService, LocalEdgeNodeQueryService>();
+builder.Services.AddScoped<ILocalEdgeNodeRepository, LocalEdgeNodeRepository>();
 
 var app = builder.Build();
 
@@ -272,9 +267,6 @@ using (var scope = app.Services.CreateScope())
     
     var localCategoryTypeCommandService = services.GetRequiredService<ILocalCategoryCommandService>();
     await localCategoryTypeCommandService.Handle(new SeedLocalCategoriesCommand());
-    
-    var sensorStateCommandService = services.GetRequiredService<ISeedSensorStateCommandService>();
-    await sensorStateCommandService.Handle(new SeedSensorStatesCommand());
     
     var sensorTypeCommandService = services.GetRequiredService<ISeedSensorTypeCommandService>();
     await sensorTypeCommandService.Handle(new SeedSensorTypesCommand());

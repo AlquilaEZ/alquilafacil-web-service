@@ -3,6 +3,7 @@ namespace AlquilaFacilPlatform.Management.Domain.Model.ValueObjects;
 public enum ESensorTypes
 {
     Smoke = 1,
-    Sound = 2,
-    Proximity = 3
+    Noise = 2,
+    Capacity = 3,
+    RestrictedArea = 4
 }
