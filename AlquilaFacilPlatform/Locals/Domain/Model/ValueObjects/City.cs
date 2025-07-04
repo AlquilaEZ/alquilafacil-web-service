@@ -1,8 +1,8 @@
 namespace AlquilaFacilPlatform.Locals.Domain.Model.ValueObjects;
 
-public record PhotoUrl(string PhotoUrlLink)
+public record City(string Value)
 {
-    public PhotoUrl() : this(string.Empty)
+    public City() : this(string.Empty)
     {
         
     }

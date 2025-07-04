@@ -30,6 +30,7 @@ using AlquilaFacilPlatform.Management.Domain.Model.Commands;
 using AlquilaFacilPlatform.Management.Domain.Repositories;
 using AlquilaFacilPlatform.Management.Domain.Services;
 using AlquilaFacilPlatform.Management.Infrastructure.Persistence.EFC.Repositories;
+using AlquilaFacilPlatform.Management.Interfaces.REST.Hubs;
 using AlquilaFacilPlatform.Notifications.Application.Internal.CommandServices;
 using AlquilaFacilPlatform.Notifications.Application.Internal.QueryServices;
 using AlquilaFacilPlatform.Notifications.Domain.Repositories;
@@ -50,6 +51,7 @@ using AlquilaFacilPlatform.Shared.Domain.Repositories;
 using AlquilaFacilPlatform.Shared.Infrastructure.Interfaces.ASP.Configuration;
 using AlquilaFacilPlatform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using AlquilaFacilPlatform.Shared.Infrastructure.Persistence.EFC.Repositories;
+using AlquilaFacilPlatform.Shared.Infrastructure.Endpoints;
 using AlquilaFacilPlatform.Subscriptions.Application.Internal.CommandServices;
 using AlquilaFacilPlatform.Subscriptions.Application.Internal.QueryServices;
 using AlquilaFacilPlatform.Subscriptions.Domain.Model.Commands;
@@ -70,6 +72,8 @@ builder.Services.AddControllers( options => options.Conventions.Add(new KebabCas
 // Add Database Connection
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var developmentString = builder.Configuration.GetConnectionString("DevelopmentConnection");
+var allowedOrigins = builder.Configuration.GetSection("AllowedFrontEndOrigins").Get<string[]>();
+
 
 // Configure Database Context and Logging Levels
 
@@ -147,12 +151,15 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add CORS Policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllPolicy",
-        policy => policy.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+    options.AddPolicy("AllowFrontendPolicy", policy =>
+        policy.WithOrigins(allowedOrigins!)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials());
 });
 
+// Add SignalR for real-time communication
+builder.Services.AddSignalR();
 
 // Shared Bounded Context Injection Configuration
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -164,11 +171,12 @@ builder.Services.AddScoped<INotificationExternalService, NotificationExternalSer
 builder.Services.AddScoped<ISubscriptionExternalService, SubscriptionExternalService>();
 
 // IAM Bounded Context Injection Configuration
-builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 
+builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<ISeedUserRoleCommandService, SeedUserRoleCommandService>();
 builder.Services.AddScoped<ISeedAdminCommandService, SeedAdminCommandService>();
+builder.Services.AddScoped<ISeedTechnicianCommandService, SeedTechnicianCommandService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
@@ -176,6 +184,7 @@ builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IHashingService, HashingService>();
 builder.Services.AddScoped<IIamContextFacade, IamContextFacade>();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Locals Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocalCommandService, LocalCommandService>();
@@ -265,6 +274,9 @@ using (var scope = app.Services.CreateScope())
     var adminCommandService = services.GetRequiredService<ISeedAdminCommandService>();
     await adminCommandService.Handle(new SeedAdminCommand());
     
+    var technicianCommandService = services.GetRequiredService<ISeedTechnicianCommandService>();
+    await technicianCommandService.Handle(new SeedTechnicianCommand());
+    
     var localCategoryTypeCommandService = services.GetRequiredService<ILocalCategoryCommandService>();
     await localCategoryTypeCommandService.Handle(new SeedLocalCategoriesCommand());
     
@@ -279,14 +291,17 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAllPolicy");
+app.UseCors("AllowFrontendPolicy");
 
-app.UseRequestAuthorization();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ReadingHub>(SignalRRoutes.ReadingHub);
 
 app.Run();

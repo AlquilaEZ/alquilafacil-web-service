@@ -1,8 +1,8 @@
 namespace AlquilaFacilPlatform.Locals.Domain.Model.ValueObjects;
 
-public record NightPrice(int PriceNight)
+public record Street(string Value)
 {
-    public NightPrice() : this(0)
+    public Street() : this(string.Empty)
     {
         
     }

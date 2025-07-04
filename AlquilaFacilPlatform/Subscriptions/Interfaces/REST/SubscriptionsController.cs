@@ -1,10 +1,9 @@
-using AlquilaFacilPlatform.IAM.Domain.Model.ValueObjects;
-using AlquilaFacilPlatform.IAM.Infrastructure.Pipeline.Middleware.Attributes;
 using AlquilaFacilPlatform.Subscriptions.Domain.Model.Commands;
 using AlquilaFacilPlatform.Subscriptions.Domain.Model.Queries;
 using AlquilaFacilPlatform.Subscriptions.Domain.Services;
 using AlquilaFacilPlatform.Subscriptions.Interfaces.REST.Resources;
 using AlquilaFacilPlatform.Subscriptions.Interfaces.REST.Transform;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlquilaFacilPlatform.Subscriptions.Interfaces.REST;
@@ -29,8 +28,8 @@ public class SubscriptionsController(
         return CreatedAtAction(nameof(GetSubscriptionById), new { subscriptionId = resource.Id }, resource);
     }
     
+    [Authorize(Roles="Admin")]
     [HttpGet]
-    [AuthorizeRole(EUserRoles.Admin)]
     public async Task<IActionResult> GetAllSubscriptions()
     {
         var getAllSubscriptionsQuery = new GetAllSubscriptionsQuery();
@@ -48,8 +47,8 @@ public class SubscriptionsController(
         return Ok(resource);
     }
 
+    [Authorize(Roles="Admin")]
     [HttpPut("{subscriptionId}")]
-    [AuthorizeRole(EUserRoles.Admin)]
     public async Task<IActionResult> ActiveSubscriptionStatus(int subscriptionId)
     {
         var activeSubscriptionStatusCommand = new ActiveSubscriptionStatusCommand(subscriptionId);

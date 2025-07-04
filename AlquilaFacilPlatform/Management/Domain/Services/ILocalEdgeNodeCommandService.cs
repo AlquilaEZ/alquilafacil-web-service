@@ -6,4 +6,5 @@ namespace AlquilaFacilPlatform.Management.Domain.Services;
 public interface ILocalEdgeNodeCommandService
 {
     Task<LocalEdgeNode?> Handle(CreateLocalEdgeNodeCommand command);
+    Task<LocalEdgeNode?> Handle(UpdateLocalEdgeNodeCommand command);
 }

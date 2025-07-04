@@ -1,17 +1,13 @@
-using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
-using AlquilaFacilPlatform.IAM.Domain.Repositories;
 using AlquilaFacilPlatform.Locals.Domain.Model.Aggregates;
 using AlquilaFacilPlatform.Locals.Domain.Model.Commands;
 using AlquilaFacilPlatform.Locals.Domain.Model.Entities;
 using AlquilaFacilPlatform.Locals.Domain.Repositories;
 using AlquilaFacilPlatform.Locals.Domain.Services;
-using AlquilaFacilPlatform.Locals.Infrastructure.Persistence.EFC.Repositories;
-using AlquilaFacilPlatform.Shared.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.Shared.Domain.Repositories;
 
 namespace AlquilaFacilPlatform.Locals.Application.Internal.CommandServices;
 
-public class LocalCommandService (ILocalRepository localRepository, ILocalCategoryRepository localCategoryRepository, IUserExternalService userExternalService, IUnitOfWork unitOfWork) : ILocalCommandService
+public class LocalCommandService (ILocalRepository localRepository, ILocalCategoryRepository localCategoryRepository, IUnitOfWork unitOfWork) : ILocalCommandService
 {
     
     public async Task<Local?> Handle(CreateLocalCommand command)
@@ -21,17 +17,24 @@ public class LocalCommandService (ILocalRepository localRepository, ILocalCatego
         {
             throw new Exception("Local category not found");
         }
-        
-        if (!userExternalService.UserExists(command.UserId))
-        {
-            throw new Exception("There are no users matching the id specified");
-        }
 
         if (command.Price <= 0)
         {
-            throw new Exception("Price must be greater than 0");
+            throw new Exception("PricePerHour must be greater than 0");
         }
+        
+        if (!command.PhotoUrls.Any())
+        {
+            throw new Exception("At least one photo URL must be provided");
+        }
+        
         var local = new Local(command);
+        
+        foreach (var photoUrl in command.PhotoUrls)
+        {
+            local.LocalPhotos.Add(new LocalPhoto(photoUrl));
+        }
+        
         await localRepository.AddAsync(local);
         await unitOfWork.CompleteAsync();
         return local;
@@ -52,7 +55,7 @@ public class LocalCommandService (ILocalRepository localRepository, ILocalCatego
 
         if (command.Price <= 0)
         {
-            throw new Exception("Price must be greater than 0");
+            throw new Exception("Price per hour must be greater than 0");
         }
         localRepository.Update(local);
         local.Update(command);

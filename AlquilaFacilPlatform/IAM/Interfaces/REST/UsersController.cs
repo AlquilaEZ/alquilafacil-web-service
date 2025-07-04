@@ -1,13 +1,9 @@
 using System.Net.Mime;
-using AlquilaFacilPlatform.IAM.Application.Internal.CommandServices;
-using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
-using AlquilaFacilPlatform.IAM.Domain.Model.Commands;
 using AlquilaFacilPlatform.IAM.Domain.Model.Queries;
-using AlquilaFacilPlatform.IAM.Domain.Model.ValueObjects;
 using AlquilaFacilPlatform.IAM.Domain.Services;
-using AlquilaFacilPlatform.IAM.Infrastructure.Pipeline.Middleware.Attributes;
 using AlquilaFacilPlatform.IAM.Interfaces.REST.Resources;
 using AlquilaFacilPlatform.IAM.Interfaces.REST.Transform;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlquilaFacilPlatform.IAM.Interfaces.REST;
@@ -38,7 +34,7 @@ public class UsersController(
      * <param name="userId">The user id</param>
      * <returns>The user resource</returns>
      */
-    [AuthorizeRole(EUserRoles.Admin)]
+    [Authorize(Roles = "Admin")]
     [HttpGet("{userId:int}")]
     public async Task<IActionResult> GetUserById(int userId)
     {
@@ -55,8 +51,8 @@ public class UsersController(
      * </summary>
      * <returns>The user resources</returns>
      */
+    [Authorize(Roles = "Admin")]
     [HttpGet]
-    [AuthorizeRole(EUserRoles.Admin)]
     public async Task<IActionResult> GetAllUsers()
     {
         var getAllUsersQuery = new GetAllUsersQuery();
@@ -65,6 +61,7 @@ public class UsersController(
         return Ok(userResources);
     }
     
+    [Authorize]
     [HttpGet("get-username/{userId:int}")]
     public async Task<IActionResult> GetUsernameById(int userId)
     {
@@ -73,6 +70,7 @@ public class UsersController(
         return Ok(username);
     }
     
+    [Authorize]
     [HttpPut("{userId:int}")]
     public async Task<IActionResult> UpdateUser(int userId, [FromBody] UpdateUsernameResource updateUsernameResource)
     {
