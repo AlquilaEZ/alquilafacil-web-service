@@ -39,8 +39,11 @@ public class ReadingCommandService(
             reading.Message
         );
         
-        await hubContext.Clients.Group($"local:{reading.LocalId}").SendAsync("ReadingReceivedEvent", readingReceivedEvent);
+        await hubContext.Clients.Group(GetGroupName(reading.LocalId)).SendAsync("ReadingReceivedEvent", readingReceivedEvent);
         
         return reading;
     }
+    
+    private static string GetGroupName(int localId) => $"local:{localId}";
+
 }
