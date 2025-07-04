@@ -1,9 +1,9 @@
 using System.Net.Mime;
-using AlquilaFacilPlatform.IAM.Infrastructure.Pipeline.Middleware.Attributes;
 using AlquilaFacilPlatform.Locals.Domain.Model.Queries;
 using AlquilaFacilPlatform.Locals.Domain.Services;
 using AlquilaFacilPlatform.Locals.Interfaces.REST.Resources;
 using AlquilaFacilPlatform.Locals.Interfaces.REST.Transform;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlquilaFacilPlatform.Locals.Interfaces.REST;
@@ -15,17 +15,17 @@ namespace AlquilaFacilPlatform.Locals.Interfaces.REST;
 public class LocalsController(ILocalCommandService localCommandService, ILocalQueryService localQueryService)
 :ControllerBase
 {
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateLocal(CreateLocalResource resource)
     {
-        var createLocalCommand = CreateLocalCommandFromResourceAssembler.ToCommandFromResources(resource);
+        var createLocalCommand = CreateLocalCommandFromResourceAssembler.ToCommandFromResource(resource);
         var local = await localCommandService.Handle(createLocalCommand);
         if (local is null) return BadRequest();
         var localResource = LocalResourceFromEntityAssembler.ToResourceFromEntity(local);
         return CreatedAtAction(nameof(GetLocalById), new { localId = localResource.Id }, localResource);
     }
-
-    [AllowAnonymous]
+    
     [HttpGet]
     public async Task<IActionResult> GetAllLocals()
     {
@@ -35,7 +35,7 @@ public class LocalsController(ILocalCommandService localCommandService, ILocalQu
         return Ok(localResources);
     }
     
-
+    [Authorize]
     [HttpGet("{localId:int}")]
     public async Task<IActionResult> GetLocalById(int localId)
     {
@@ -46,6 +46,7 @@ public class LocalsController(ILocalCommandService localCommandService, ILocalQu
         return Ok(localResource);
     }
     
+    [Authorize]
     [HttpPut("{localId:int}")]
     public async Task<IActionResult> UpdateLocal(int localId, UpdateLocalResource resource)
     {
@@ -56,7 +57,7 @@ public class LocalsController(ILocalCommandService localCommandService, ILocalQu
         return Ok(localResource);
     }
     
-    
+    [Authorize]
     [HttpGet("search-by-category-id-capacity-range/{categoryId:int}/{minCapacity:int}/{maxCapacity:int}")]
     public async Task<IActionResult> SearchByCategoryIdAndCapacityRange(int categoryId, int minCapacity, int maxCapacity)
     {
@@ -66,14 +67,16 @@ public class LocalsController(ILocalCommandService localCommandService, ILocalQu
         return Ok(localResources);
     }
     
+    [Authorize]
     [HttpGet("get-all-districts")]
-    public IActionResult GetAllDistricts()
+    public async Task<IActionResult> GetAllDistricts()
     {
         var getAllLocalDistrictsQuery = new GetAllLocalDistrictsQuery();
-        var districts = localQueryService.Handle(getAllLocalDistrictsQuery);
+        var districts = await localQueryService.Handle(getAllLocalDistrictsQuery);
         return Ok(districts);
     }
     
+    [Authorize]
     [HttpGet("get-user-locals/{userId:int}")]
     public async Task<IActionResult> GetUserLocals(int userId)
     {

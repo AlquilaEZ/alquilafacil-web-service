@@ -1,8 +1,8 @@
 namespace AlquilaFacilPlatform.Locals.Domain.Model.ValueObjects;
 
-public record RatingComment(int Value)
+public record District(string Value)
 {
-    public RatingComment() : this(0)
+    public District() : this(string.Empty)
     {
         
     }

@@ -9,17 +9,17 @@ public class LocalQueryService(ILocalRepository localRepository) : ILocalQuerySe
 {
     public async Task<IEnumerable<Local>> Handle(GetAllLocalsQuery query)
     {
-        return await localRepository.ListAsync();
+        return await localRepository.GetLocalsAsync();
     }
 
     public async Task<Local?> Handle(GetLocalByIdQuery query)
     {
-        return await localRepository.FindByIdAsync(query.LocalId);
+        return await localRepository.GetLocalByIdAsync(query.LocalId);
     }
 
-    public HashSet<string> Handle(GetAllLocalDistrictsQuery query)
+    public async Task<HashSet<string>> Handle(GetAllLocalDistrictsQuery query)
     {
-        return localRepository.GetAllDistrictsAsync();
+        return await localRepository.GetAllDistrictsAsync();
     }
 
     public async Task<IEnumerable<Local>> Handle(GetLocalsByUserIdQuery query)
@@ -29,8 +29,7 @@ public class LocalQueryService(ILocalRepository localRepository) : ILocalQuerySe
 
     public async Task<IEnumerable<Local>> Handle(GetLocalsByCategoryIdAndCapacityRangeQuery query)
     {
-        return await localRepository.GetLocalsByCategoryIdAndCapacityrange(query.LocalCategoryId, query.MinCapacity,
-            query.MaxCapacity);
+        return await localRepository.GetLocalsByCategoryIdAndCapacityRange(query.LocalCategoryId, query.MinCapacity, query.MaxCapacity);
     }
 
     public async Task<bool> Handle(IsLocalOwnerQuery query)

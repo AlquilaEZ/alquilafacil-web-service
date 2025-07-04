@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using AlquilaFacilPlatform.IAM.Application.Internal.OutboundServices;
 using AlquilaFacilPlatform.IAM.Domain.Model.Aggregates;
+using AlquilaFacilPlatform.IAM.Domain.Model.ValueObjects;
 using AlquilaFacilPlatform.IAM.Infrastructure.Tokens.JWT.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -24,59 +25,27 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
     {
         var secret = _tokenSettings.Secret;
         var key = Encoding.ASCII.GetBytes(secret);
+        var roleName = Enum.GetName(typeof(EUserRoles), user.RoleId);
+        if (roleName == null)
+        {
+            throw new ArgumentException("Invalid role ID");
+        }
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.Sid, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                new Claim(ClaimTypes.Role, roleName)
             }),
             Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature
+            )
         };
+
         var tokenHandler = new JsonWebTokenHandler();
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return token;
-    }
-
-    /**
-     * <summary>
-     *     VerifyPassword token
-     * </summary>
-     * <param name="token">The token to validate</param>
-     * <returns>The user id if the token is valid, null otherwise</returns>
-     */
-    public async Task<int?> ValidateToken(string token)
-    {
-        // If token is null or empty
-        if (string.IsNullOrEmpty(token))
-            return null;
-        // Otherwise, perform validation
-        var tokenHandler = new JsonWebTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_tokenSettings.Secret);
-        try
-        {
-            var tokenValidationResult = await tokenHandler.ValidateTokenAsync(token, new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                // Expiration without delay
-                ClockSkew = TimeSpan.Zero
-            });
-
-            var jwtToken = (JsonWebToken)tokenValidationResult.SecurityToken;
-            var userId = int.Parse(jwtToken.Claims.First(claim => claim.Type == ClaimTypes.Sid).Value);
-            return userId;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return null;
-        }
+        return tokenHandler.CreateToken(tokenDescriptor);
     }
 }

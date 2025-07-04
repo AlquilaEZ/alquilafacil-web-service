@@ -25,4 +25,22 @@ public class LocalEdgeNodeCommandService(
         await unitOfWork.CompleteAsync();
         return localEdgeNode;
     }
+    public async Task<LocalEdgeNode?> Handle(UpdateLocalEdgeNodeCommand command)
+    {
+        var localEdgeNode = await localEdgeNodeRepository.GetByLocalIdAsync(command.LocalId);
+        if (localEdgeNode == null)
+        {
+            throw new Exception("Local edge node not found");
+        }
+
+        if (!await localExternalService.LocalExists(command.LocalId))
+        {
+            throw new Exception("Local does not exist");
+        }
+
+        localEdgeNode.Update(command);
+        localEdgeNodeRepository.Update(localEdgeNode);
+        await unitOfWork.CompleteAsync();
+        return localEdgeNode;
+    }
 }

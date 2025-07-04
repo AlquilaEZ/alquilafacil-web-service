@@ -1,9 +1,9 @@
 using System.Net.Mime;
-using AlquilaFacilPlatform.IAM.Infrastructure.Pipeline.Middleware.Attributes;
 using AlquilaFacilPlatform.Management.Domain.Model.Queries;
 using AlquilaFacilPlatform.Management.Domain.Services;
 using AlquilaFacilPlatform.Management.Interfaces.REST.Resources;
 using AlquilaFacilPlatform.Management.Interfaces.REST.Transform;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlquilaFacilPlatform.Management.Interfaces.REST;
@@ -24,6 +24,7 @@ public class ReadingsController(IReadingQueryService readingQueryService, IReadi
          return StatusCode(201, readingResource);
      }
      
+     [Authorize]
      [HttpGet("local-id/{localId}")]
      public async Task<IActionResult> GetReadingsBySensorId(int localId)
      {

@@ -22,6 +22,11 @@ public class LocalEdgeNode
         EdgeNodeUrl = command.EdgeNodeUrl;
     }
     
+    public void Update(UpdateLocalEdgeNodeCommand command)
+    {
+        EdgeNodeUrl = command.EdgeNodeUrl;
+    }
+    
     public int Id { get; set; }
     public int LocalId { get; set; }
     public string EdgeNodeUrl { get; set; } = string.Empty;
